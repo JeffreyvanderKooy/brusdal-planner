@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NorEngros Planning App</title>
+    <link
+      rel="stylesheet"
+      href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="./node_modules/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="./src/css/customStyles.css" />
+    <link rel="stylesheet" href="./src/css/loader.css" />
+    <link rel="stylesheet" href="./src/css/marker.css" />
+    <script
+      defer
+      src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+    ></script>
+    <script defer type="module" src="./src/js/controller.js"></script>
+    <script
+      defer
+      src="https://unpkg.com/@googlemaps/markerclustererplus"
+    ></script>
+  </head>
+  <body>
+    <div class="vh-100 mh-100 d-flex flex-column overflow-hidden m-0 p-0 z-1">
+      <div class="loader-container bg-body-secondary">
+        <div class="loader">
+          <div class="truckWrapper">
+            <div class="truckBody">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 198 93"
+                class="trucksvg"
+              >
+                <path
+                  stroke-width="3"
+                  stroke="#282828"
+                  fill="#F83D3D"
+                  d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"
+                ></path>
+                <path
+                  stroke-width="3"
+                  stroke="#282828"
+                  fill="#7D7C7C"
+                  d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"
+                ></path>
+                <path
+                  stroke-width="2"
+                  stroke="#282828"
+                  fill="#282828"
+                  d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"
+                ></path>
+                <rect
+                  stroke-width="2"
+                  stroke="#282828"
+                  fill="#FFFCAB"
+                  rx="1"
+                  height="7"
+                  width="5"
+                  y="63"
+                  x="187"
+                ></rect>
+                <rect
+                  stroke-width="2"
+                  stroke="#282828"
+                  fill="#282828"
+                  rx="1"
+                  height="11"
+                  width="4"
+                  y="81"
+                  x="193"
+                ></rect>
+                <rect
+                  stroke-width="3"
+                  stroke="#282828"
+                  fill="#DFDFDF"
+                  rx="2.5"
+                  height="90"
+                  width="121"
+                  y="1.5"
+                  x="6.5"
+                ></rect>
+                <rect
+                  stroke-width="2"
+                  stroke="#282828"
+                  fill="#DFDFDF"
+                  rx="2"
+                  height="4"
+                  width="6"
+                  y="84"
+                  x="1"
+                ></rect>
+              </svg>
+            </div>
+            <div class="truckTires">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 30 30"
+                class="tiresvg"
+              >
+                <circle
+                  stroke-width="3"
+                  stroke="#282828"
+                  fill="#282828"
+                  r="13.5"
+                  cy="15"
+                  cx="15"
+                ></circle>
+                <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 30 30"
+                class="tiresvg"
+              >
+                <circle
+                  stroke-width="3"
+                  stroke="#282828"
+                  fill="#282828"
+                  r="13.5"
+                  cy="15"
+                  cx="15"
+                ></circle>
+                <circle fill="#DFDFDF" r="7" cy="15" cx="15"></circle>
+              </svg>
+            </div>
+            <div class="road"></div>
+
+            <svg
+              xml:space="preserve"
+              viewBox="0 0 453.459 453.459"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              xmlns="http://www.w3.org/2000/svg"
+              id="Capa_1"
+              version="1.1"
+              fill="#000000"
+              class="lampPost"
+            >
+              <path
+                d="M252.882,0c-37.781,0-68.686,29.953-70.245,67.358h-6.917v8.954c-26.109,2.163-45.463,10.011-45.463,19.366h9.993
+      c-1.65,5.146-2.507,10.54-2.507,16.017c0,28.956,23.558,52.514,52.514,52.514c28.956,0,52.514-23.558,52.514-52.514
+      c0-5.478-0.856-10.872-2.506-16.017h9.992c0-9.354-19.352-17.204-45.463-19.366v-8.954h-6.149C200.189,38.779,223.924,16,252.882,16
+      c29.952,0,54.32,24.368,54.32,54.32c0,28.774-11.078,37.009-25.105,47.437c-17.444,12.968-37.216,27.667-37.216,78.884v113.914
+      h-0.797c-5.068,0-9.174,4.108-9.174,9.177c0,2.844,1.293,5.383,3.321,7.066c-3.432,27.933-26.851,95.744-8.226,115.459v11.202h45.75
+      v-11.202c18.625-19.715-4.794-87.527-8.227-115.459c2.029-1.683,3.322-4.223,3.322-7.066c0-5.068-4.107-9.177-9.176-9.177h-0.795
+      V196.641c0-43.174,14.942-54.283,30.762-66.043c14.793-10.997,31.559-23.461,31.559-60.277C323.202,31.545,291.656,0,252.882,0z
+      M232.77,111.694c0,23.442-19.071,42.514-42.514,42.514c-23.442,0-42.514-19.072-42.514-42.514c0-5.531,1.078-10.957,3.141-16.017
+      h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-grow-1 d-flex flex-row h-100">
+        <div
+          class="container w-25 bg-body-secondary p-1 h-100 d-flex flex-column"
+        >
+          <div class="p-2 w-100 mb-2 border-bottom border-2">
+            <img
+              src="https://www.jdeprofessional.no/siteassets/finn-din-grossist/norengros-01.png"
+              alt="NorEngros Logo"
+              class="w-40"
+            />
+          </div>
+          <div class="input-group mb-2">
+            <span class="input-group-text">
+              <i
+                class="bi bi-search"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                data-bs-title="Search for streetaddress, housenumber, route or postcode"
+              ></i>
+            </span>
+            <input
+              type="text"
+              id="searchOrders"
+              class="form-control"
+              placeholder="Search..."
+            />
+            <span class="input-group-text">
+              <i
+                class="bi bi-calendar-check"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                data-bs-title="Filter customers wich have only ordered in the last number of months."
+              ></i>
+            </span>
+            <div class="form-control w-25-custom">
+              <input
+                type="number"
+                id="searchMonths"
+                class="fw-bold w-100 border-0 form-control pointer"
+                value="3"
+                min="1"
+                max="12"
+              />
+            </div>
+          </div>
+          <div class="container d-flex justify-content-between">
+            <p class="fw-semibold text-dark-emphasis">
+              Stops:
+              <span class="fst-italic" id="numStops">0</span>
+            </p>
+            <p class="fw-semibold text-dark-emphasis">
+              Customers:
+              <span class="fst-italic" id="numCustomers">0</span>
+            </p>
+          </div>
+          <ul
+            class="list-group d-flex flex-column gap-1 overflow-auto flex-grow-1"
+            id="cardsContainer"
+          >
+            <!-- <li
+            class="list-group-item p-2 text-body-emphasis address-card address-many-orders"
+          >
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="w-50 h-100">
+                <p class="m-0 p-0 fw-semibold ">
+                  Loddefjordveien 40
+                </p>
+                <p class="m-0 p-0 fw-normal ">Loddefjord, 5071</p>
+                <p class="m-0 p-0 fst-italic ">KB200</p>
+              </div>
+              <div class="rounded-circle">
+                <img
+                  src="./src/img/customer_icon.png"
+                  class="img-fluid"
+                  style="width: 40px; height: 40px"
+                  data-bs-toggle="collapse"
+                  href="#collapseExample"
+                  role="button"
+                  aria-expanded="false"
+                  aria-controls="collapseExample"
+                />
+              </div>
+            </div>
+            <div class="collapse" id="collapseExample">
+              <div class="p-1">
+                <hr class="rounded-circle" />
+                <small class="d-flex justify-content-evenly">
+                  <span class="fst-italic">123457</span>
+                  <span class="">Toma-Haakonsvern</span>
+                </small>
+              </div>
+            </div>
+          </li> -->
+          </ul>
+          <div
+            class="p-2 d-flex justify-content-evenly align-items-center fst-italic border-top border-2 mt-2"
+          >
+            <p class="m-0">Designed And Developed By</p>
+            <p class="m-0">
+              Jeffrey van der Kooy&trade;
+              <a
+                href="https://github.com/JeffreyvanderKooy"
+                target="_blank"
+                title="My Github"
+              >
+                <i class="bi bi-github"></i>
+              </a>
+            </p>
+          </div>
+        </div>
+        <div class="w-75 d-flex flex-column">
+          <div id="map" class="w-100 flex-grow-1 bg-white rounded m-1"></div>
+          <div class="bg-body-secondary p-1 d-flex flex-row gap-2">
+            <div class="btn-group dropup">
+              <button
+                type="button"
+                class="btn btn-outline-primary dropdown-toggle"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                HIGHLIGHT ROUTE
+              </button>
+              <ul class="dropdown-menu" id="highlightRoute"></ul>
+            </div>
+
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#newAddresses"
+              aria-controls="newAddresses"
+            >
+              ADD NEW ADDRESSES
+            </button>
+
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#addOrders"
+              aria-controls="addOrders"
+            >
+              ADD # ORDERS
+            </button>
+
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#myRoutes"
+              aria-controls="myRoutes"
+            >
+              MY ROUTES
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="offcanvas offcanvas-start w-75"
+        tabindex="-1"
+        id="newAddresses"
+        aria-labelledby="newAddresses"
+        data-bs-backdrop="static"
+      >
+        <div class="offcanvas-header">
+          <h3 class="offcanvas-title">Add New Customers</h3>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body p-4 overflow-hidden">
+          <div class="h-75 w-100">
+            <div class="w-100 h-100 container-fluid">
+              <div class="h-25">
+                <h5 class="offcanvas-title mb-5">Expected Input Format:</h5>
+                <table class="table fs-4">
+                  <thead>
+                    <tr>
+                      <th scope="col"># ID</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Postcode</th>
+                      <th scope="col">Area</th>
+                      <th scope="col">Address</th>
+                      <th scope="col">Route</th>
+                      <th scope="col">Creation Date</th>
+                      <th scope="col">last Ordered</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="fs-5 fst-italic">
+                      <td>176763</td>
+                      <td>Nygård Barnehage</td>
+                      <td>5164</td>
+                      <td>Laksevåg</td>
+                      <td>Alfred Offerdalsvei 24</td>
+                      <td>KB200</td>
+                      <td>02.12.2011</td>
+                      <td>15.10.2024</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <textarea
+                class="form-control resize-none fs-8 h-75"
+                data-handler="processCustomers"
+              ></textarea>
+              <div class="w-100 d-flex justify-content-center">
+                <button
+                  type="button"
+                  class="btn btn-success m-2 fs-5 data-submit--button"
+                  data-handler="processCustomers"
+                >
+                  Submit Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="offcanvas offcanvas-start w-75"
+        tabindex="-1"
+        id="addOrders"
+        aria-labelledby="addOrders"
+        data-bs-backdrop="static"
+      >
+        <div class="offcanvas-header">
+          <h3 class="offcanvas-title">Add Orders</h3>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body p-4 overflow-hidden w-100">
+          <div class="h-75 w-100">
+            <div class="w-100 h-100 container-fluid">
+              <div class="h-25 w-100">
+                <h5 class="offcanvas-title mb-5">Expected Input Format:</h5>
+                <table class="table fs-5">
+                  <thead>
+                    <tr>
+                      <th scope="col"># ID</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Address</th>
+                      <th scope="col">Postcode</th>
+                      <th scope="col">Sales Code</th>
+                      <th scope="col">Sales Group</th>
+                      <th scope="col">Area</th>
+                      <th scope="col"># ID</th>
+                      <th scope="col">Name</th>
+                      <th scope="col">Route</th>
+                      <th scope="col"># Orders</th>
+                      <th scope="col"># Deliveries</th>
+                      <th scope="col">#Avg Deliveries</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="fst-italic fs-6">
+                      <td>180401</td>
+                      <td>Nygård Barnehage</td>
+                      <td>Alfred Offerdalsvei 24</td>
+                      <td>5164</td>
+                      <td>KB16</td>
+                      <td>Bergen Kommune</td>
+                      <td>Laksevåg</td>
+                      <td>180401</td>
+                      <td>Nygård Barnehage</td>
+                      <td>KB200</td>
+                      <td>8</td>
+                      <td>11</td>
+                      <td>1,38</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <textarea
+                class="form-control resize-none fs-8 h-75"
+                data-handler="processNumOrders"
+              ></textarea>
+
+              <div class="w-100 d-flex justify-content-center">
+                <button
+                  type="button"
+                  class="btn btn-success m-2 fs-5 data-submit--button"
+                  data-handler="processNumOrders"
+                >
+                  Submit Data
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="offcanvas offcanvas-end w-40"
+        tabindex="-1"
+        id="myRoutes"
+        aria-labelledby="offcanvasRightLabel"
+        data-bs-backdrop="false"
+      >
+        <div class="offcanvas-header">
+          <h3 class="offcanvas-title">My Routes</h3>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column h-100">
+          <div class="container w-100 input-group fs-4 mb-2">
+            <input
+              class="form-control"
+              type="text"
+              id="newRoute"
+              placeholder="New Route..."
+            />
+
+            <span class="input-group-text">
+              <i class="bi bi-plus"></i>
+            </span>
+          </div>
+          <div class="container w-100 input-group">
+            <select class="form-control fs-6" id="editRouteSelect">
+              <option value="" id="clearHighlighted" class="fst-italic">
+                Select A Route To Start Planning
+              </option>
+            </select>
+            <span class="input-group-text">
+              <i class="bi bi-pen"></i>
+            </span>
+          </div>
+
+          <hr />
+          <div class="container w-100 d-flex justify-content-evenly fs-8 gap-2">
+            <table class="w-40 table table-primary m-0 fw-normal">
+              <tr><td>This Address Orders Alot</td></tr>
+            </table>
+            <table class="w-40 table table-info m-0 fw-normal">
+              <tr><td>This Address Orders Little</td></tr>
+            </table>
+          </div>
+          <hr />
+          <div
+            class="container flex-grow-1 overflow-auto d-flex flex-column gap-3"
+            id="userRoutesContainer"
+          >
+            <!-- <div class="user-route container w-100 border p-2 rounded">
+              <div class="d-flex justify-content-between">
+                <h5>Route 1</h5>
+                <h6>
+                  Stops:
+                  <span class="fst-italic">0</span>
+                  Customers:
+                  <span class="fst-italic">0</span>
+                </h6>
+              </div>
+
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Address</th>
+                    <th scope="col">Postcode</th>
+                    <th scope="col">Area</th>
+                    <th scope="col"># Customers</th>
+                    <th scope="col">Kommune</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="fs-8 fst-italic">
+                    <td>Alfred Offerdalsvei 24</td>
+                    <td>5071</td>
+                    <td>Laksevåg</td>
+                    <td>2</td>
+                    <td>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-check2 me-5"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"
+                        />
+                      </svg>
+
+                      <button class="btn row-delete p-0" type="button">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                          class="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708"
+                          />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

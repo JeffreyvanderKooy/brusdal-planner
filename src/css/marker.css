@@ -1,0 +1,104 @@
+#map {
+  width: 100vw;
+  height: 50vh;
+}
+
+.maps-marker {
+  border: white 1px solid;
+  align-items: center;
+  background-color: #cc0000;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  font-size: 14px;
+  gap: 15px;
+  height: 30px;
+  justify-content: center;
+  padding: 4px;
+  position: relative;
+  position: relative;
+  transition: all 0.3s ease-out;
+  width: 30px;
+  transform: scale(1.1);
+  overflow: hidden;
+  pointer-events: all !important;
+}
+
+.maps-marker .icon {
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  transform: translateY(22%);
+}
+
+.maps-marker .details {
+  display: none;
+  background-color: #f8f9fa;
+  flex-direction: column;
+}
+
+hr {
+  width: 100%;
+  opacity: 0.5;
+  background-color: black;
+  padding: 0;
+  margin: 0;
+}
+
+.maps-marker.highlight {
+  background-color: #f8f9fa;
+  color: black;
+  border-radius: 4px;
+  box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.2);
+  height: fit-content;
+  padding: 10px 15px;
+  width: auto;
+}
+
+.maps-marker.highlight::after {
+  border-top: 9px solid #ffffff;
+}
+
+.marker-exit {
+  display: none;
+  transform: scale(1.2);
+  z-index: 1;
+  opacity: 0.5;
+}
+
+.marker-exit:hover {
+  opacity: 1;
+}
+
+.maps-marker.highlight .marker-exit {
+  display: block;
+}
+
+.maps-marker.highlight .details {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 10px;
+  gap: 5px;
+  position: relative;
+}
+
+.maps-marker.highlight .details p {
+  font-size: 14px;
+  text-transform: lowercase;
+  padding: 0;
+  margin: 0;
+}
+
+.maps-marker.highlight .icon {
+  display: none;
+}
+
+.maps-marker:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.highlight-on-map {
+  background-color: hsl(216, 100%, 50%);
+}

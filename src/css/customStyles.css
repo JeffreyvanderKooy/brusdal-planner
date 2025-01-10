@@ -1,0 +1,63 @@
+.w-25-custom {
+  width: 25% !important;
+  flex: 0 0 auto !important;
+}
+
+.h-5 {
+  height: 5% !important;
+}
+
+.address-card {
+  border-left: 4px solid #e2e3e5;
+  transform: scale(0.95);
+  transition: 0.2s all;
+}
+
+.address-card:hover {
+  transform: scale(0.98);
+}
+
+.address-less-orders {
+  border-left: 4px solid #cc0000;
+}
+
+.address-many-orders {
+  border-left: 4px solid hsl(216, 100%, 75%);
+}
+
+.fs-8 {
+  font-size: 12px;
+}
+
+.resize-none {
+  resize: none;
+}
+
+.table-often {
+  background-color: #cfe2ff;
+}
+
+.table-alot {
+  background-color: #0d6efd;
+}
+
+.row-delete {
+  opacity: 0;
+  transition: all 0.3s;
+}
+
+tr:hover .row-delete {
+  opacity: 1;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+* {
+  user-select: none;
+}
+
+.w-40 {
+  width: 38% !important;
+}
