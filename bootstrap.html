@@ -184,6 +184,7 @@
               id="searchOrders"
               class="form-control"
               placeholder="Search..."
+              autocomplete="off"
             />
             <span class="input-group-text">
               <i
@@ -204,7 +205,9 @@
               />
             </div>
           </div>
-          <div class="container d-flex justify-content-between">
+          <div
+            class="container d-flex justify-content-between border-bottom border-2"
+          >
             <p class="fw-semibold text-dark-emphasis">
               Stops:
               <span class="fst-italic" id="numStops">0</span>
@@ -256,8 +259,8 @@
           <div
             class="p-2 d-flex justify-content-evenly align-items-center fst-italic border-top border-2 mt-2"
           >
-            <p class="m-0">Designed And Developed By</p>
-            <p class="m-0">
+            <p class="m-0 fs-8">Designed And Developed By</p>
+            <p class="m-0 fs-8">
               Jeffrey van der Kooy&trade;
               <a
                 href="https://github.com/JeffreyvanderKooy"
@@ -275,17 +278,17 @@
             <div class="btn-group dropup">
               <button
                 type="button"
-                class="btn btn-outline-primary dropdown-toggle"
+                class="btn btn-outline-primary dropdown-toggle fs-8"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 HIGHLIGHT ROUTE
               </button>
-              <ul class="dropdown-menu" id="highlightRoute"></ul>
+              <ul class="dropdown-menu fs-8" id="highlightRoute"></ul>
             </div>
 
             <button
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary fs-8"
               type="button"
               data-bs-toggle="offcanvas"
               data-bs-target="#newAddresses"
@@ -295,7 +298,7 @@
             </button>
 
             <button
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary fs-8"
               type="button"
               data-bs-toggle="offcanvas"
               data-bs-target="#addOrders"
@@ -305,7 +308,7 @@
             </button>
 
             <button
-              class="btn btn-outline-primary"
+              class="btn btn-outline-primary fs-8"
               type="button"
               data-bs-toggle="offcanvas"
               data-bs-target="#myRoutes"
@@ -323,6 +326,7 @@
         id="newAddresses"
         aria-labelledby="newAddresses"
         data-bs-backdrop="static"
+        data-handler="processCustomers"
       >
         <div class="offcanvas-header">
           <h3 class="offcanvas-title">Add New Customers</h3>
@@ -334,11 +338,11 @@
           ></button>
         </div>
         <div class="offcanvas-body p-4 overflow-hidden">
-          <div class="h-75 w-100">
+          <div class="w-100">
             <div class="w-100 h-100 container-fluid">
               <div class="h-25">
                 <h5 class="offcanvas-title mb-5">Expected Input Format:</h5>
-                <table class="table fs-4">
+                <table class="table fs-5">
                   <thead>
                     <tr>
                       <th scope="col"># ID</th>
@@ -347,8 +351,8 @@
                       <th scope="col">Area</th>
                       <th scope="col">Address</th>
                       <th scope="col">Route</th>
-                      <th scope="col">Creation Date</th>
-                      <th scope="col">last Ordered</th>
+                      <th scope="col">Creation</th>
+                      <th scope="col">Last Order</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -366,7 +370,8 @@
                 </table>
               </div>
               <textarea
-                class="form-control resize-none fs-8 h-75"
+                style="min-height: 30vh"
+                class="form-control resize-none fs-8"
                 data-handler="processCustomers"
               ></textarea>
               <div class="w-100 d-flex justify-content-center">
@@ -389,6 +394,7 @@
         id="addOrders"
         aria-labelledby="addOrders"
         data-bs-backdrop="static"
+        data-handler="processNumOrders"
       >
         <div class="offcanvas-header">
           <h3 class="offcanvas-title">Add Orders</h3>
@@ -399,31 +405,33 @@
             aria-label="Close"
           ></button>
         </div>
-        <div class="offcanvas-body p-4 overflow-hidden w-100">
-          <div class="h-75 w-100">
+        <div
+          class="offcanvas-body p-4 overflow-hidden w-100 d-flex flex-column"
+        >
+          <div class="h-100 w-100">
             <div class="w-100 h-100 container-fluid">
-              <div class="h-25 w-100">
+              <div class="w-100">
                 <h5 class="offcanvas-title mb-5">Expected Input Format:</h5>
-                <table class="table fs-5">
+                <table class="table fs-8">
                   <thead>
                     <tr>
                       <th scope="col"># ID</th>
                       <th scope="col">Name</th>
                       <th scope="col">Address</th>
                       <th scope="col">Postcode</th>
-                      <th scope="col">Sales Code</th>
-                      <th scope="col">Sales Group</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Group</th>
                       <th scope="col">Area</th>
                       <th scope="col"># ID</th>
                       <th scope="col">Name</th>
                       <th scope="col">Route</th>
-                      <th scope="col"># Orders</th>
-                      <th scope="col"># Deliveries</th>
-                      <th scope="col">#Avg Deliveries</th>
+                      <th scope="col"># Ord.</th>
+                      <th scope="col"># Del.</th>
+                      <th scope="col">#Avg Del.</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr class="fst-italic fs-6">
+                    <tr class="fst-italic fs-8">
                       <td>180401</td>
                       <td>Nygård Barnehage</td>
                       <td>Alfred Offerdalsvei 24</td>
@@ -442,7 +450,8 @@
                 </table>
               </div>
               <textarea
-                class="form-control resize-none fs-8 h-75"
+                style="min-height: 30vh"
+                class="form-control resize-none fs-8 flex-grow-1"
                 data-handler="processNumOrders"
               ></textarea>
 
@@ -466,6 +475,7 @@
         id="myRoutes"
         aria-labelledby="offcanvasRightLabel"
         data-bs-backdrop="false"
+        data-bs-scroll="true"
       >
         <div class="offcanvas-header">
           <h3 class="offcanvas-title">My Routes</h3>
@@ -500,7 +510,7 @@
             </span>
           </div>
 
-          <hr />
+          <hr class="m-2" />
           <div class="container w-100 d-flex justify-content-evenly fs-8 gap-2">
             <table class="w-40 table table-primary m-0 fw-normal">
               <tr><td>This Address Orders Alot</td></tr>
@@ -509,7 +519,7 @@
               <tr><td>This Address Orders Little</td></tr>
             </table>
           </div>
-          <hr />
+          <hr class="m-2" />
           <div
             class="container flex-grow-1 overflow-auto d-flex flex-column gap-3"
             id="userRoutesContainer"

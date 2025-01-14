@@ -7,8 +7,23 @@ import { restoreProtoTypeAddress } from './state_classes/address.js';
 import { restoreProtoTypeCustomer } from './state_classes/customer.js';
 import { restoreProtoTypeRoute } from './state_classes/userRoute.js';
 
+import { API_WAIT } from './config.js';
+import { API_KEY } from './config.js';
+import { API_URL } from './config.js';
+import { getJSON } from './helper.js';
+import { wait } from './helper.js';
+
 import { Customer } from './state_classes/customer.js';
 import { Address } from './state_classes/address.js';
+
+let Place;
+
+export async function importPlace() {
+  const { Place: importPlace } = await window.google.maps.importLibrary(
+    'places'
+  );
+  Place = importPlace;
+}
 
 // # STATE TO USE ACROSS ALL MODULES, SHOULDN ONLY BE MODIFIED IN THIS FILE # //
 export const state = {
@@ -18,54 +33,55 @@ export const state = {
 };
 
 // # CREATES NEW CUSTOMERS OUT OF GIVEN ARRAY INPUT  # //
-export async function addNewCustomers(userInput) {
+export async function processCustomers(userInput) {
+  const newAddresses = [];
+
   // iterates over the loop aslong as there is userInput to parse
   while (userInput.length !== 0) {
     const data = userInput.splice(0, 8).map(data => data.trim()); // take the first 8 values in the array
     const newCustomer = new Customer(...data);
-    if (newCustomer.route !== 'KB05') {
-      // check if this customer already exists in the current database
-      const checkForDuplicate = state.customers.find(
-        cust =>
-          cust.id === newCustomer.id ||
-          (cust.name.toLowerCase() === newCustomer.name.toLowerCase() &&
-            cust.streetAddress.toLowerCase() ===
-              newCustomer.streetAddress.toLowerCase())
-      );
 
-      if (!checkForDuplicate) state.customers.push(newCustomer);
+    if (newCustomer.route === 'KB05') continue;
+
+    // check if this customer already exists in the current database
+    const customer = state.customers.find(
+      cust =>
+        cust.id === newCustomer.id ||
+        (cust.name.toLowerCase() === newCustomer.name.toLowerCase() &&
+          cust.streetAddress.toLowerCase() ===
+            newCustomer.streetAddress.toLowerCase())
+    );
+
+    if (customer) continue;
+
+    state.customers.push(newCustomer);
+
+    const adress = state.addresses.find(
+      a =>
+        a.streetAddress.toLowerCase() ===
+        newCustomer.streetAddress.toLowerCase()
+    );
+
+    if (adress) adress.deliveries.push(newCustomer);
+
+    if (!adress) {
+      // if it doesnt exists add a new address object
+      const newAddress = new Address(
+        capitalizeWords(newCustomer.streetAddress)
+      );
+      newAddress.addCustomers([newCustomer]);
+      state.addresses.push(newAddress);
+      newAddresses.push(newAddress);
     }
   }
 
-  // get all unique addresses (eg. streetnames)
-  const uniqueAddresses = new Set([
-    ...state.customers.map(cust => cust.streetAddress.toLowerCase()),
-  ]);
-
-  // try if this address already exists
-  uniqueAddresses.forEach(function (streetName) {
-    const addressExists = state.addresses.find(
-      address => address.streetAddress.toLowerCase() === streetName
-    );
-
-    if (!addressExists) {
-      // if it doesnt exists add a new address object
-      const newAddress = new Address(capitalizeWords(streetName));
-      newAddress.addCustomers(
-        state.customers.filter(
-          cust => cust.streetAddress.toLowerCase() === streetName.toLowerCase()
-        )
-      );
-
-      state.addresses.push(newAddress);
-    }
-  });
-
-  updateLocalStorage();
+  return newAddresses;
 }
 
 // # ADDS AVERAGENUM ORDERS FOR EACH CUSTOMER THAT MATCHES USERINPUT # //
-export function parseNumOrders(userInput) {
+export function processNumOrders(userInput) {
+  const result = [];
+
   // iterates over the loop aslong as there is userInput to parse
   while (userInput.length !== 0) {
     const data = userInput.splice(0, 13); // take the first 13 values in the array
@@ -80,33 +96,103 @@ export function parseNumOrders(userInput) {
 
       // find the customer with the same customer id in the this.customers array
       // and if there is a result process the results
-      state.customers
-        .find(
-          cust =>
-            cust.id === custID ||
-            (cust.streetAddress === address && cust.name === name)
-        )
-        ?.setKommune(isKommune)
-        .setNumOrders(numOrders);
+      const customer = state.customers.find(
+        cust =>
+          cust.id === custID ||
+          (cust.streetAddress === address && cust.name === name)
+      );
+
+      if (customer) {
+        result.push(customer);
+        customer.setKommune(isKommune).setNumOrders(numOrders);
+      }
     }
   }
 
   updateLocalStorage();
+  return result;
 }
 
-// # FETCHES COORDS FOR ALL ADDRESSES THAT DO NOT HAVE THE PROPERTY COORDS # //
-export async function FetchAllCoords() {
-  for (const address of state.addresses.filter(add => !add.coords)) {
+// # TRY FETCHING ADDRESSES BY PLACE # //
+export async function tryFetchPlace(addresses) {
+  for (const query of addresses) {
+    if (query.coords) continue;
+
+    const request = {
+      textQuery: query.deliveries[0].name,
+      fields: ['location'],
+      region: 'no',
+    };
+
+    const { places } = await Place.searchByText(request);
+
+    if (places.length === 0) continue; // no result
+
+    const result = await new Place({ id: places[0].id });
+    await result.fetchFields({
+      fields: ['location'],
+    });
+
+    const coords = {
+      lat: result.location.lat(),
+      lng: result.location.lng(),
+    };
+
+    query.coords = coords;
+  }
+
+  return addresses.reduce(
+    (acc, address) => {
+      acc[address.coords ? 'succes' : 'error'].push(address);
+      return acc;
+    },
+    { error: [], succes: [] }
+  );
+}
+
+// # TRY FETCHING ADDRESSES COORDS BY ADDRESS # //
+export async function tryFetchAddress(addresses) {
+  for (const query of addresses) {
     try {
-      await address.fetchCoord(); // Await each fetchCoord() call individually
+      const address = `${query.streetAddress}, ${query.postcode}, ${query.area}`;
+
+      const url = `${API_URL}/json?address=${encodeURIComponent(
+        address
+      )}&region=no&key=${API_KEY}`;
+
+      const data = await getJSON(url); // get API response using getJSON helper function
+      await wait(API_WAIT); // delay to avoid overloading API server
+
+      if (data.status !== 'OK') {
+        console.log(data);
+        throw new Error(`No results found!`);
+      }
+
+      const { results } = data;
+
+      query.handleGeoData(results);
     } catch (error) {
-      console.error(`An error occured: `, error.message);
+      console.error(
+        `⚠️ An error occured fetch data for ${query.streetAddress}:\n${error.message} `
+      );
     }
   }
 
-  state.addresses = state.addresses.filter(add => add.coords); // filter out all addresses where there could not be fetched coords
+  return addresses.reduce(
+    (acc, address) => {
+      acc[address.coords ? 'succes' : 'error'].push(address);
+      return acc;
+    },
+    { error: [], succes: [] }
+  );
+}
 
-  updateLocalStorage();
+// # FILTERS OUT ALL ADDRESSES THAT DO NOT HAVE COORDS # //
+export function setAddresses() {
+  state.addresses = state.addresses.filter(
+    add => add.coords && add.deliveries.length >= 1
+  );
+  state.customers = state.addresses.map(add => add.deliveries).flat();
 }
 
 // # SETS LOCALSTORAGE TO CURRENT STATE # //
@@ -162,6 +248,8 @@ export function pushRoute(route) {
 // # POP THE GIVEN ROUTE FROM THE STATE.USERROUTES ARRAY # //
 export function popRoute(route) {
   const index = state.userRoutes.findIndex(stateRoute => stateRoute === route);
-  if (index) state.userRoutes.splice(index, 1);
+
+  if (index !== undefined) state.userRoutes.splice(index, 1);
+
   updateLocalStorage();
 }

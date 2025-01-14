@@ -7,9 +7,13 @@ import 'regenerator-runtime/runtime';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import { UPDATE_LOADBTN_MS } from './config.js';
+
 import * as model from './model.js';
-import { parseArr } from './helper.js';
+import { findDuplicateCoord, parseArr } from './helper.js';
 import { updateTimeLeft } from './helper.js';
+import { findDuplicateCoord } from './helper.js';
+import { compressDuplicates } from './helper.js';
 
 import mapView from './views/mapView.js';
 import orderContainerView from './views/ordersContainerView.js';
@@ -66,26 +70,29 @@ async function controlSubmitData(data, type) {
   try {
     if (!data || !type) return;
     // make the button have a loading animation
-    inputView.renderLoadBtn();
+    inputView.load();
 
     // turn the string input into a array
     const parsedData = parseArr(data);
 
     if (type === 'processCustomers') {
       // send data to model
-      model.addNewCustomers(parsedData);
+      const newAddresses = await model.processCustomers(parsedData);
 
       // upate user on amount of work left
       const interval = setInterval(
         () => inputView.setLoadingText(updateTimeLeft()),
-        1000
+        UPDATE_LOADBTN_MS
       );
 
-      // models makes API calls
-      await model.FetchAllCoords();
+      // model makes API calls
+      const result = await model.tryFetchAddress(newAddresses); // try fetching by address, returns failed to fetch
+      console.log(result);
 
-      // done fetching, stop upating user
-      clearInterval(interval);
+      compressDuplicates(findDuplicateCoord(model.state.addresses)); // Finds addresses with same coords and combines them into one
+      model.setAddresses(); // filters out addresses with no coords or no customers
+
+      clearInterval(interval); // done fetching, stop upating user
 
       // # UPDATE UI  # //
       mapView.initMarkers(model.state.addresses);
@@ -93,12 +100,15 @@ async function controlSubmitData(data, type) {
     }
 
     if (type === 'processNumOrders') {
-      model.parseNumOrders(parsedData);
-      orderContainerView.styleCards();
-    } // send data to model
+      model.processNumOrders(parsedData); // send data to model
+      orderContainerView.styleCards(model.state.addresses); // style cards with new data
+    }
 
-    // restore the "submit data" button
-    inputView.renderNormalBtn().clearInput();
+    inputView.reset();
+    routesContainerView.updateRoutes(model.state.userRoutes); // updates HTML tables with new data
+
+    // save data
+    model.updateLocalStorage();
   } catch (error) {
     console.error(error);
   }
@@ -110,7 +120,7 @@ async function controlSubmitData(data, type) {
 
   await mapView.loadMap(); // load the map
 
-  mapView.initMarkers(model.state.addresses);
+  mapView.initMarkers(model.state.addresses); // load Markers
 
   // adding event listeners
   inputView.addHandlerSubmit(controlSubmitData);

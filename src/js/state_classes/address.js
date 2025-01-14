@@ -1,9 +1,4 @@
 'use strict';
-import { getJSON } from '../helper.js';
-import { API_KEY } from '../config.js';
-import { API_URL } from '../config.js';
-import { API_WAIT } from '../config.js';
-import { wait } from '../helper.js';
 
 import $ from 'jquery';
 
@@ -34,36 +29,13 @@ export class Address {
   }
 
   /**
-   * Gets the coordinates for this address object using Google Maps API
-   * @this Address the current address object
-   */
-  async fetchCoord() {
-    try {
-      const address = `${this.streetAddress}, ${this.postcode}, ${this.area}`;
-
-      const url = `${API_URL}${encodeURIComponent(address)}&key=${API_KEY}`;
-
-      const data = await getJSON(url); // get API response using getJSON helper function
-      await wait(API_WAIT); // delay to avoid overloading API server
-
-      if (data.status !== 'OK')
-        throw new Error(`No Results for: ${address} (${data.status})`);
-
-      const { lat, lng } = data.results[0].geometry.location;
-      this.coords = { lat, lng };
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  }
-
-  /**
    * Defines the this.deliveries array as the given customers array
    * @param {Array} customers
    * @this Address the current address object
    */
   addCustomers(customers) {
     this.deliveries = customers;
-    this.#postcodeAndArea = customers;
+    this.postcodeAndArea = customers;
 
     this.calcNumAverageOrder();
   }
@@ -87,15 +59,52 @@ export class Address {
   /**
    * Sets the area, postcode and route properties to the value of the first customers in the given customers array
    * @param {Array} deliveriesArr  */
-  set #postcodeAndArea(deliveriesArr) {
+  set postcodeAndArea(deliveriesArr) {
+    if (this.area || this.postcode || this.route) return;
+
     this.area = deliveriesArr[0].area;
     this.postcode = deliveriesArr[0].postcode;
     this.route = deliveriesArr[0].route;
   }
 
+  handleGeoData(data) {
+    const result = data.find(data =>
+      data.address_components.find(comp => comp.long_name === 'Norway')
+    );
+
+    if (!result) throw new Error('Fetched address is not located in Norway.');
+
+    // find address details
+    const nr = result.address_components.find(comp =>
+      comp.types.includes('street_number')
+    )?.long_name;
+
+    const street = result.address_components.find(comp =>
+      comp.types.includes('route')
+    )?.long_name;
+
+    const area = result.address_components.find(comp =>
+      comp.types.includes('postal_town')
+    )?.long_name;
+
+    const postcode = result.address_components.find(comp =>
+      comp.types.includes('postal_code')
+    )?.long_name;
+
+    this.postcode = postcode || this.postcode;
+    this.area = area || this.area;
+    this.streetAddress = street && nr ? `${street} ${nr}` : this.streetAddress;
+
+    this.coords = result.geometry.location;
+
+    this.deliveries.forEach(del => (del.coords = this.coords)); // set the coords to the addresses coords for each customer
+  }
+
   // # API FOR MARKER # //
   toggleMarkerIcon() {
     $(this.marker.content).toggleClass('highlight-on-map');
+
+    return this;
   }
 
   toggleMarkerPopup() {
@@ -103,14 +112,49 @@ export class Address {
     this.marker.zIndex = this.marker.content.classList.contains('highlight')
       ? 10
       : 1;
+
+    return this;
   }
 
   toggleMarker(map = null) {
     this.marker.map = map;
+
+    return this;
   }
 
   markerIsVisible() {
     return this.marker ? this.marker.map !== null : false;
+  }
+
+  setMarkerContent() {
+    // generating markup
+    const content = document.createElement('div');
+    content.classList.add('maps-marker');
+    content.setAttribute('data-id', this.id);
+    content.innerHTML = `
+    <div class="position-absolute top-0 end-0 p-1 marker-exit">
+          <i class="bi bi-x marker-exit"></i>
+    </div>
+    <div class="icon">
+        <p>${this.deliveries.length}</p>
+    </div>
+    <div class="details">
+        
+        <h5 class="text-center">${this.streetAddress}</h5>
+        <div class="d-flex flex-column overflow-y-auto gap-1">
+        ${this.deliveries
+          .map(
+            del =>
+              `<div class="d-flex"><p class="me-3">${del.id}</p><p>${del.name}</p></div>`
+          )
+          .join('<hr />')}
+        </div>
+    </div>
+    `;
+
+    this.marker.content = content;
+
+    return this;
   }
 }
 
@@ -125,8 +169,8 @@ export function restoreProtoTypeAddress(addressObj, customerArr) {
 
   addressObj.deliveries = customerArr.filter(
     tempCust =>
-      tempCust.streetAddress.toLowerCase() ===
-      addressObj.streetAddress.toLowerCase()
+      tempCust.coords?.lat === addressObj.coords.lat &&
+      tempCust.coords?.lng === addressObj.coords.lng
   );
 
   return addressObj;

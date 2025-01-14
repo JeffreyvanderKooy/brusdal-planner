@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import { CANVAS_TOGGLE_DELAY_MS } from '../config';
 
 class inputView {
   #submitBtns = $('.data-submit--button');
@@ -36,7 +37,7 @@ class inputView {
   }
 
   // # CLEARS INPUT FIELD # //
-  clearInput() {
+  #clearInput() {
     $(`textarea[data-handler="${this.#lastSubmittedHandler}"]`)?.val('');
     return this;
   }
@@ -50,8 +51,14 @@ class inputView {
     return this;
   }
 
+  // # CLEARS INPUT FIELD AND RESETS BUTTON AND HIDES THE OFFCANVAS # //
+  reset() {
+    this.#clearInput();
+    this.#renderNormalBtn();
+  }
+
   // # RENDERS A BUTTON WITH A LOADING ANIMATION INSTEAD OF THE REGULAR BUTTON # //
-  renderLoadBtn() {
+  load() {
     const markup = `<span
                     class="spinner-border spinner-border-sm"
                     aria-hidden="true"
@@ -68,12 +75,13 @@ class inputView {
   }
 
   // # RENDERS THE REGULAR BUTTON, REMOVING THE LOADING BUTTON # //
-  renderNormalBtn() {
+  #renderNormalBtn() {
     $(`.btn[data-handler="${this.#lastSubmittedHandler}"]`)
       ?.html('Submit Data')
       .prop('disabled', false);
 
     this.#toggleCanvasBtns(false);
+    setTimeout(() => this.#toggleCanvas(), CANVAS_TOGGLE_DELAY_MS);
 
     return this;
   }
@@ -83,6 +91,19 @@ class inputView {
     $('.offcanvas-header .btn-close').each((_, ele) =>
       $(ele).prop('disabled', bool)
     );
+  }
+
+  // # HIDES THE CANVAS # //
+  #toggleCanvas() {
+    const offCanvasElement = $(
+      `.offcanvas[data-handler="${this.#lastSubmittedHandler}"]`
+    ).get(0);
+    const offCanvasInstance =
+      bootstrap.Offcanvas.getInstance(offCanvasElement) ||
+      new bootstrap.Offcanvas(offCanvasElement);
+
+    offCanvasInstance.hide(); // Close the OffCanvas
+    $('.offcanvas-backdrop')?.hide();
   }
 }
 

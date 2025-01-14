@@ -75,6 +75,7 @@ class mapView {
   async loadMap() {
     const { Map } = await google.maps.importLibrary('maps');
     const { AdvancedMarkerElement } = await google.maps.importLibrary('marker');
+
     this.#AdvancedMarkerElement = AdvancedMarkerElement;
 
     const position = await this.#getLocation(); // get current user locations
@@ -125,38 +126,12 @@ class mapView {
   }
 
   // # ADD A MARKER FOR GIVEN ADDRESS # //
-  addMarker(address) {
+  #addMarker(address) {
     if (address.marker) address.marker.map = null;
-
-    // generating markup
-    const content = document.createElement('div');
-    content.classList.add('maps-marker');
-    content.setAttribute('data-id', address.id);
-    content.innerHTML = `
-    <div class="position-absolute top-0 end-0 p-1 marker-exit">
-          <i class="bi bi-x marker-exit"></i>
-    </div>
-    <div class="icon">
-        <p>${address.deliveries.length}</p>
-    </div>
-    <div class="details">
-        
-        <h5 class="text-center">${address.streetAddress}</h5>
-        <div class="d-flex flex-column overflow-y-auto gap-1">
-        ${address.deliveries
-          .map(
-            del =>
-              `<div class="d-flex"><p class="me-3">${del.id}</p><p>${del.name}</p></div>`
-          )
-          .join('<hr />')}
-        </div>
-    </div>
-    `;
 
     // setting marker options
     const marker = new this.#AdvancedMarkerElement({
       map: this.#map,
-      content: content,
       position: address.coords,
       title: address.streetAddress,
       gmpClickable: true,
@@ -164,7 +139,7 @@ class mapView {
     });
 
     address.marker = marker; // save the marker object on the Address
-    address.toggleMarker(); // hides the marker on initial load
+    address.setMarkerContent().toggleMarker(); // generates content for the marker
   }
 
   // # EVENT DELEGATION FOR MAPCLICKS # //
@@ -185,7 +160,7 @@ class mapView {
 
   // # RENDERS ALL THE MARKERS GIVEN IN THE ARRAY AND HIDES THEM ON INITIAL # //
   initMarkers(addresses) {
-    addresses.forEach(address => this.addMarker(address));
+    addresses.forEach(address => this.#addMarker(address));
 
     return this;
   }
@@ -207,6 +182,8 @@ class mapView {
       center: address.coords, // New center
       zoom: 16, // New zoom level
     });
+
+    address.toggleMarkerPopup();
 
     return this;
   }
@@ -260,6 +237,7 @@ class mapView {
     const deliveryThreshold = zoom <= 13 ? 3 : zoom <= 14 ? 2 : 0;
 
     addresses.forEach(address => {
+      if (!address.coords) return;
       const isInBounds = bounds.contains(address.marker.position);
       const meetsDeliveryCriteria =
         address.deliveries.length >= deliveryThreshold;

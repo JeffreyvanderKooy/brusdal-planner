@@ -12,13 +12,12 @@
   display: flex;
   font-size: 14px;
   gap: 15px;
-  height: 30px;
+  height: 20px;
   justify-content: center;
   padding: 4px;
   position: relative;
-  position: relative;
   transition: all 0.3s ease-out;
-  width: 30px;
+  width: 20px;
   transform: scale(1.1);
   overflow: hidden;
   pointer-events: all !important;
@@ -27,9 +26,9 @@
 .maps-marker .icon {
   border-radius: 50%;
   color: #ffffff;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: bold;
-  transform: translateY(22%);
+  transform: translateY(24%);
 }
 
 .maps-marker .details {
@@ -52,7 +51,7 @@ hr {
   border-radius: 4px;
   box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.2);
   height: fit-content;
-  padding: 10px 15px;
+  padding: 5px;
   width: auto;
 }
 
@@ -84,8 +83,7 @@ hr {
 }
 
 .maps-marker.highlight .details p {
-  font-size: 14px;
-  text-transform: lowercase;
+  font-size: 12px;
   padding: 0;
   margin: 0;
 }

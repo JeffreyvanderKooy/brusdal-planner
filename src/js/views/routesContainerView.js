@@ -18,7 +18,7 @@ class RoutesContainer {
 
   constructor() {
     // Event handler for changing the currently selected route
-    $(this.#selectRoute).on('change', this.selectTable.bind(this));
+    $(this.#selectRoute).on('change', this.#selectTable.bind(this));
   }
 
   /**
@@ -90,6 +90,7 @@ class RoutesContainer {
     const name = $(this.#newRouteInput).val().replace(/\s+/g, ' ').trim();
 
     $(this.#newRouteInput).val('').blur();
+    console.log(state);
 
     // check if there is already a route with given name
     const checkForDuplicate = state.userRoutes.find(
@@ -106,7 +107,6 @@ class RoutesContainer {
   // # DELETE ROUTE # //
   deleteRoute(e) {
     const id = e.target.closest('.user-route').dataset.id;
-    console.log(id);
 
     const route = state.userRoutes.find(route => route.id === id);
 
@@ -119,8 +119,13 @@ class RoutesContainer {
     }
   }
 
+  // # UPDATE TABLE ROWS # //
+  updateRoutes(routes) {
+    routes.forEach(route => route.update());
+  }
+
   // # FUNCTION CALLED WHEN USER SELECTS A NEW ROUTE TO EDIT # //
-  selectTable(e) {
+  #selectTable(e) {
     const selectedRouteID = $(e.currentTarget).val();
 
     if (!selectedRouteID) return this.#clearHighlighted();
@@ -144,6 +149,8 @@ class RoutesContainer {
 
   // # RENDER HTML FOR GIVEN ROUTES # //
   render(input) {
+    $(this.#tableContainer).html('');
+
     Array.isArray(input)
       ? input.forEach(input => this.#renderRoute(input))
       : this.#renderRoute(input);

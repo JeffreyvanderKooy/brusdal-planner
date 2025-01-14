@@ -1,5 +1,6 @@
 import { state } from './model';
 import { API_WAIT } from './config';
+import { add } from 'lodash';
 
 // # RETURNS DATA FROM GIVEN API URL # //
 export async function getJSON(url) {
@@ -96,4 +97,39 @@ export function search(addressArr, searchFor) {
   return addressArr.filter(address =>
     params.some(param => address[param].toLowerCase().includes(searchFor))
   );
+}
+
+// # RETURNS AN ARRAY OF ARRAYS WITH ADDRESSES WITH SAME COORDS # //
+export function findDuplicateCoord(addresses) {
+  const result = [];
+
+  addresses.forEach(function (address) {
+    if (result.flat().includes(address) || !address.coords) return;
+
+    const sameCoords = addresses.filter(
+      x =>
+        x.coords?.lat === address.coords?.lat &&
+        x.coords?.lng === address.coords?.lng
+    );
+
+    if (sameCoords.length > 1) {
+      result.push(sameCoords);
+    }
+  });
+
+  return result;
+}
+
+export function compressDuplicates(addresses) {
+  addresses.forEach(arr => {
+    const [address, ...rest] = arr;
+
+    const customers = [
+      ...new Set([address.deliveries, rest.map(add => add.deliveries)].flat(2)),
+    ];
+
+    rest.forEach(rest => rest.addCustomers([]));
+
+    address.addCustomers(customers);
+  });
 }

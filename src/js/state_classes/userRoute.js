@@ -5,6 +5,7 @@ import $ from 'jquery';
 
 export class UserRoute {
   table; // used to store the table element belonging to this route after rendering
+  #rowContainer;
   plannedAddresses = []; // empty array to store added addresses to this new route
 
   constructor(name) {
@@ -18,9 +19,10 @@ export class UserRoute {
    * @this userRoute
    */
   addAddress(address) {
-    this.plannedAddresses.push(address);
-    this.table
-      .find('table tbody')
+    if (!this.plannedAddresses.includes(address))
+      this.plannedAddresses.push(address);
+
+    this.#rowContainer
       .get(0)
       .insertAdjacentHTML('afterbegin', this.createAddressRow(address));
     this.updateTableUI();
@@ -51,7 +53,7 @@ export class UserRoute {
    * @returns HTML Table markup
    */
   tableHTML() {
-    return ` <div class="user-route container fs-5 w-100 border p-2 rounded"  data-id="${
+    return ` <div class="user-route container fs-6 w-100 border p-2 rounded"  data-id="${
       this.id
     }">
                 <div class="d-flex justify-content-between">
@@ -64,7 +66,7 @@ export class UserRoute {
                   </h6>
                  </div>
 
-            <table class="table table-striped table-hover fs-6">
+            <table class="table table-striped table-hover fs-8">
               <thead class="fw-bold">
                 <tr>
                   <td scope="col">Address</th>
@@ -72,7 +74,7 @@ export class UserRoute {
                   <td scope="col" class="text-center">Area</th>
                   <td scope="col" class="text-center"># Customers</th>
                   <td scope="col" class="text-center">Kommune</th>
-                  <td scope="col" class="text-center"><button type="button" class="btn btn-outline-danger delete-route">
+                  <td scope="col" class="text-center"><button type="button" class="fs-8 btn btn-outline-danger delete-route">
                     <i class="bi bi-trash-fill me-1"></i>Delete</button></i></th> 
                 </tr>
               </thead>
@@ -124,9 +126,16 @@ export class UserRoute {
     return html;
   }
 
+  // # UPDATES HTML AND MARKUP FOR THIS TABLE # //
+  update() {
+    $(this.#rowContainer).html('');
+    this.plannedAddresses.forEach(planned => this.addAddress(planned));
+  }
+
   // # DEFINE THIS.TABLE (TO BE CALLED AFTER THE TABLE HAS BEEN RENDERED) # //
   setTable() {
     this.table = $(`.user-route[data-id="${this.id}"]`);
+    this.#rowContainer = this.table.find('table tbody');
     return this;
   }
 

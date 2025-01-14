@@ -45,7 +45,7 @@ class OrdersContainer {
       if (this.#isSearching) clearTimeout(this.#isSearching);
 
       this.#isSearching = setTimeout(
-        this.searchCustomers.bind(this),
+        this.#searchCustomers.bind(this),
         DELAY_SEARCH_FILTER
       );
     });
@@ -55,8 +55,8 @@ class OrdersContainer {
       if (this.#isFiltering) clearTimeout(this.#isFiltering);
 
       this.#isFiltering = setTimeout(() => {
-        this.filterAddresses() // Refilter addresses
-          .searchCustomers(); // hide/show HTML cards)}
+        this.#filterAddresses() // Refilter addresses
+          .#searchCustomers(); // hide/show HTML cards)}
         mapView.showMarkers(this.#filteredAddresses); // hides all current markers and shows the ones in this.#filtered
       }, DELAY_SEARCH_FILTER);
     });
@@ -66,7 +66,7 @@ class OrdersContainer {
    * searches the currently filtered customers for the customers of wich the properties include what the user typed for in the searchbar
    * @returns ordersContainerView
    */
-  searchCustomers() {
+  #searchCustomers() {
     // get current search input
     const query = $(this.#searchInput).val().toLowerCase();
 
@@ -99,7 +99,7 @@ class OrdersContainer {
    * filters the addresses based on number of months input, also called when months input is called to rerender markers on map and HTML cards
    * @returns ordersContainerView
    */
-  filterAddresses() {
+  #filterAddresses() {
     const addressesInRoutes = addressesInPlannedRoutes().map(
       address => address.id
     );
@@ -134,14 +134,14 @@ class OrdersContainer {
       )
       .join('');
 
-    const html = `<li class="list-group-item fs-5 p-2 text-body-emphasis address-card" style="display: none;" data-id="${address.id}">
+    const html = `<li class="list-group-item fs-6 p-2 text-body-emphasis address-card" style="display: none;" data-id="${address.id}">
                     <div class="d-flex justify-content-between align-items-center">
                       <div class="flex-grow-1 h-100  address-info pointer">
                       <p class="m-0 p-0 fw-semibold">${address.streetAddress}</p>
                       <p class="m-0 p-0 fw-normal">${address.postcode}, ${address.area}</p>
                       <p class="m-0 p-0 fst-italic">${address.route}</p>
                     </div>
-                   <div class="rounded-circle d-flex pointer align-items-center justify-content-center h-100 gap-1 position-relative">
+                   <div class="opacity-75 rounded-circle d-flex pointer align-items-center justify-content-center h-100 gap-1 position-relative">
                       <p class="m-0 fw-bold">${address.deliveries.length}</p>
                       <div class="d-flex justify-content-center align-items-center" style="width: 40px; height: 40px;">
                         <img
@@ -171,7 +171,7 @@ class OrdersContainer {
     address.toggleSlideDropdown();
 
     // adds custom styling if additional info about the customer has been provided
-    this.styleCard(address);
+    this.#styleCard(address);
 
     return this;
   }
@@ -192,25 +192,24 @@ class OrdersContainer {
 
   // # CREATE A HTML CARD FOR EACH GIVEN ADDRESS IN THE GIVEN ARRAY # //
   render(input) {
+    $(this.#cardsContainer).html('');
+
     Array.isArray(input)
-      ? input
-          .filter(address => !address.card)
-          .forEach(address => this.#renderCard(address))
+      ? input.forEach(address => this.#renderCard(address))
       : this.#renderCard(input);
 
     return this;
   }
 
   // # ADDS BORDER STYLING AND ICON STYLING FOR EACH ADDRESS CARD IN STATE.ADDRESSES # //
-  styleCards() {
-    state.addresses
-      .filter(address => address.card)
-      .forEach(address => this.styleCard(address));
+  styleCards(addresses) {
+    addresses.forEach(address => this.#styleCard(address));
   }
 
   // # ADDS CUSTOM STYLING TO THE ADDRESS CARD DEPENDING ON # ORDERS ETC # //
-  styleCard(address) {
+  #styleCard(address) {
     if (!address.card) return;
+
     // if there is a address.numOrders, then the card will get extra styling depending on the amount of orders
     if (address.calcNumAverageOrder() > 0)
       $(address.card).addClass(
@@ -223,35 +222,6 @@ class OrdersContainer {
       $(`.address-card[data-id="${address.id}"] img`).attr('src', kommuneImg);
   }
 
-  // # ADDS A MARKER TO THE MAP FOR EACH ADDRESS IN THIS.FILTEREDADDRESSES ARRAY  # //
-  renderAllFilteredMarkers() {
-    // Hide all markers that are supposed to be not  visible (theyre not in the filteredAddresses array)
-    state.addresses.forEach(address => {
-      if (
-        !this.#filteredAddresses.includes(address) &&
-        address.markerIsVisible()
-      )
-        address.toggleMarker();
-    });
-
-    this.#filteredAddresses.forEach(address => {
-      if (!address.isMarkerVisible()) address.toggleMarker();
-    });
-
-    // for each address that isnt the currently highlighted route, add a regular marker
-    this.#filteredAddresses
-      .filter(address => address.route !== mapView.getHighlightedRoute())
-      .forEach(address => address.defaultMarkerIcon());
-
-    // if there is a currently highlighted route, for each of those addresses with that route make a orange marker
-    if (mapView.getHighlightedRoute())
-      this.#filteredAddresses
-        .filter(address => address.route === mapView.getHighlightedRoute())
-        .forEach(address => address.highlightMarkerIcon());
-
-    return this;
-  }
-
   // # RETURNS THIS.FILTEREDADDRESSES # //
   getFilteredAddresses() {
     return this.#filteredAddresses;
@@ -259,7 +229,7 @@ class OrdersContainer {
 
   // # REFILTERS ADDRESS, RENDERS A MAPHEADER BUTTON FOR EACH ROUTE, CREATES A MARKER FOR EACH FILTERED ADDRESS AND CREATES HTML CARDS FOR THESE # //
   update(input) {
-    this.render(input).filterAddresses().searchCustomers();
+    this.render(input).#filterAddresses().#searchCustomers();
     mapView.renderHighlightRouteBtn().showMarkers(this.#filteredAddresses);
 
     return this;
