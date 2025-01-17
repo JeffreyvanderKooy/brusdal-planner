@@ -6,6 +6,7 @@ import $ from 'jquery';
 import { state } from '../model.js';
 import { UserRoute } from '../state_classes/userRoute.js';
 import mapView from './mapView.js';
+import modalView from './modalView.js';
 
 class RoutesContainer {
   // used to store the currently highlighted route, this is the only route the users is allowed to add, remove deliveries to
@@ -48,7 +49,8 @@ class RoutesContainer {
   // # LOGIC FOR ADDING A DELIVERY TO CURRENTLY HIGHLIGHTED ROUTE # //
   planDelivery(e) {
     if (!e.shiftKey) return;
-    if (!this.#highlighted) return alert('Hightlight a route first!');
+    if (!this.#highlighted)
+      return modalView.warning('You must select a route to edit!');
 
     const clickedAddressCard = e.target.closest('.address-card'); // get the HTML card
 
@@ -78,9 +80,11 @@ class RoutesContainer {
     userRoute.removeAddress(address);
 
     // create a marker for this address, making it orange if this route is currently highlighted
-    mapView.getHighlightedRoute() === address.route
-      ? mapView.addMarker(address, 'icon-div-highlight')
-      : mapView.addMarker(address);
+    const isHightlighted = mapView.highlightedRoute === address.route;
+    const map = mapView.map;
+
+    address.toggleMarker(map);
+    if (isHightlighted) address.toggleMarkerIcon(true);
   }
 
   // # LOGIC FOR CREATING A NEW ROUTE AND SOME UI UPDATING # //
@@ -97,7 +101,7 @@ class RoutesContainer {
       route => route.name === name
     );
 
-    if (checkForDuplicate) return alert('Route already exists!');
+    if (checkForDuplicate) return modalView.error('Name already exists!');
 
     const newRoute = new UserRoute(name); // make a new route object
     this.render(newRoute); // render the HTML table
@@ -105,18 +109,20 @@ class RoutesContainer {
   }
 
   // # DELETE ROUTE # //
-  deleteRoute(e) {
+  async deleteRoute(e) {
     const id = e.target.closest('.user-route').dataset.id;
 
     const route = state.userRoutes.find(route => route.id === id);
 
-    if (!route) return;
+    if (!route) return modalView.error();
 
-    if (confirm('Are you sure that you want to delete this route FOREVER?')) {
-      route.remove();
-      this.#clearHighlighted();
-      return route;
-    }
+    const res = await modalView.confirmDelete();
+
+    if (!res) return false;
+
+    route.remove();
+    route === this.#highlighted && this.#clearHighlighted();
+    return route;
   }
 
   // # UPDATE TABLE ROWS # //
@@ -149,8 +155,6 @@ class RoutesContainer {
 
   // # RENDER HTML FOR GIVEN ROUTES # //
   render(input) {
-    $(this.#tableContainer).html('');
-
     Array.isArray(input)
       ? input.forEach(input => this.#renderRoute(input))
       : this.#renderRoute(input);
@@ -159,6 +163,8 @@ class RoutesContainer {
 
   // # RENDER HTML FOR A SINGULAR ROUTE # //
   #renderRoute(userRoute) {
+    if (userRoute.table) userRoute.table.remove();
+
     $(this.#tableContainer)
       .get(0)
       .insertAdjacentHTML('afterbegin', userRoute.tableHTML());

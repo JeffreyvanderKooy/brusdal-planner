@@ -10,16 +10,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { UPDATE_LOADBTN_MS } from './config.js';
 
 import * as model from './model.js';
-import { findDuplicateCoord, parseArr } from './helper.js';
-import { updateTimeLeft } from './helper.js';
-import { findDuplicateCoord } from './helper.js';
-import { compressDuplicates } from './helper.js';
+import {
+  findDuplicateCoord,
+  parseArr,
+  compressDuplicates,
+  updateTimeLeft,
+} from './helper.js';
 
 import mapView from './views/mapView.js';
 import orderContainerView from './views/ordersContainerView.js';
 import routesContainerView from './views/routesContainerView.js';
 import loaderView from './views/loaderView.js';
 import inputView from './views/inputView.js';
+import modalView from './views/modalView.js';
 
 // # FUNCTION CALLED WHEN PRESSED ENTER IN THE "New Route" INPUT # //
 function controlNewRoute(e) {
@@ -27,17 +30,20 @@ function controlNewRoute(e) {
   const newRoute = routesContainerView.createNewRoute(e);
 
   // if no new route obj return
-  if (!newRoute) return;
+  if (!newRoute) return modalView.error();
 
   // add this new route obj to state const
   model.pushRoute(newRoute);
 }
 
 // # FUNCTION CALLED WHEN USER CLICKS THE DELETE BIN ICON ON A ACTIVE userRoute # //
-function controlDeleteRoute(e) {
-  const route = routesContainerView.deleteRoute(e);
-  if (!route) return;
+async function controlDeleteRoute(e) {
+  const route = await routesContainerView.deleteRoute(e);
+
+  if (!route) return modalView.error();
+
   model.popRoute(route);
+
   orderContainerView.update(model.state.addresses);
 }
 
@@ -68,7 +74,7 @@ function controlUnplanDelivery(e) {
 // # FUNCTION CALLED WHEN USER SHIFTS CLICKS "Submit Data" BUTTON # //
 async function controlSubmitData(data, type) {
   try {
-    if (!data || !type) return;
+    if (!data || !type) return modalView.error();
     // make the button have a loading animation
     inputView.load();
 
@@ -87,7 +93,6 @@ async function controlSubmitData(data, type) {
 
       // model makes API calls
       const result = await model.tryFetchAddress(newAddresses); // try fetching by address, returns failed to fetch
-      console.log(result);
 
       compressDuplicates(findDuplicateCoord(model.state.addresses)); // Finds addresses with same coords and combines them into one
       model.setAddresses(); // filters out addresses with no coords or no customers
@@ -97,11 +102,14 @@ async function controlSubmitData(data, type) {
       // # UPDATE UI  # //
       mapView.initMarkers(model.state.addresses);
       orderContainerView.update(model.state.addresses);
+
+      modalView.doneFetching(result);
     }
 
     if (type === 'processNumOrders') {
       model.processNumOrders(parsedData); // send data to model
       orderContainerView.styleCards(model.state.addresses); // style cards with new data
+      modalView.succes();
     }
 
     inputView.reset();
@@ -111,6 +119,7 @@ async function controlSubmitData(data, type) {
     model.updateLocalStorage();
   } catch (error) {
     console.error(error);
+    modalView.error();
   }
 }
 

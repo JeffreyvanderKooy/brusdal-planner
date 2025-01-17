@@ -2,8 +2,7 @@ import $ from 'jquery';
 
 import ordersContainerView from './ordersContainerView';
 import { state } from '../model';
-import { STANDARD_COORDS } from '../config';
-import { API_KEY } from '../config';
+import { STANDARD_COORDS, API_KEY } from '../config';
 
 (g => {
   var h,
@@ -101,10 +100,7 @@ class mapView {
 
     // Update clusters when the map bounds change
     this.#map.addListener('bounds_changed', () => {
-      this.#updateCluster(
-        this.#map,
-        ordersContainerView.getFilteredAddresses()
-      );
+      this.#updateCluster(this.#map, ordersContainerView.filteredAddresses);
     });
 
     return this;
@@ -194,7 +190,7 @@ class mapView {
     if (!e.target.classList.contains('dropdown-item')) return;
 
     const clickedRoute = e.target.dataset.route; // clicked route e.g "KB200"
-    const filteredAddresses = ordersContainerView.getFilteredAddresses(); // get currently displayed routes from the ordersContainerView
+    const filteredAddresses = ordersContainerView.filteredAddresses; // get currently displayed routes from the ordersContainerView
 
     // remove special marker for all markers with the currently selected route and replace them with regular black ones
     if (this.#highlightedRoute)
@@ -222,8 +218,13 @@ class mapView {
   }
 
   // # TO BE USED IN ORDERSCONTAINER VIEW # //
-  getHighlightedRoute() {
+  get highlightedRoute() {
     return this.#highlightedRoute;
+  }
+
+  // # RETURNS MAP FOR ROUTESCONTAINERVIEW # //
+  get map() {
+    return this.#map;
   }
 
   #updateCluster(map, addresses) {

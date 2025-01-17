@@ -1,6 +1,4 @@
 import { state } from './model';
-import { API_WAIT } from './config';
-import { add } from 'lodash';
 
 // # RETURNS DATA FROM GIVEN API URL # //
 export async function getJSON(url) {

@@ -101,9 +101,12 @@ export class Address {
   }
 
   // # API FOR MARKER # //
-  toggleMarkerIcon() {
-    $(this.marker.content).toggleClass('highlight-on-map');
-
+  toggleMarkerIcon(bool) {
+    bool
+      ? !$(this.marker.content).hasClass('highlight-on-map') &&
+        $(this.marker.content).addClass('highlight-on-map')
+      : $(this.marker.content).toggleClass('highlight-on-map');
+    
     return this;
   }
 

@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 export class UserRoute {
   table; // used to store the table element belonging to this route after rendering
-  #rowContainer;
+  rowContainer;
   plannedAddresses = []; // empty array to store added addresses to this new route
 
   constructor(name) {
@@ -22,7 +22,7 @@ export class UserRoute {
     if (!this.plannedAddresses.includes(address))
       this.plannedAddresses.push(address);
 
-    this.#rowContainer
+    this.rowContainer
       .get(0)
       .insertAdjacentHTML('afterbegin', this.createAddressRow(address));
     this.updateTableUI();
@@ -128,14 +128,14 @@ export class UserRoute {
 
   // # UPDATES HTML AND MARKUP FOR THIS TABLE # //
   update() {
-    $(this.#rowContainer).html('');
+    $(this.rowContainer).html('');
     this.plannedAddresses.forEach(planned => this.addAddress(planned));
   }
 
   // # DEFINE THIS.TABLE (TO BE CALLED AFTER THE TABLE HAS BEEN RENDERED) # //
   setTable() {
     this.table = $(`.user-route[data-id="${this.id}"]`);
-    this.#rowContainer = this.table.find('table tbody');
+    this.rowContainer = this.table.find('table tbody');
     return this;
   }
 

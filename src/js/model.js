@@ -1,20 +1,16 @@
 'use strict';
 
 import cloneDeep from 'lodash/cloneDeep';
-import { cleanAddress } from './helper.js';
-import { capitalizeWords } from './helper.js';
-import { restoreProtoTypeAddress } from './state_classes/address.js';
-import { restoreProtoTypeCustomer } from './state_classes/customer.js';
+import { cleanAddress, capitalizeWords } from './helper.js';
+import { restoreProtoTypeAddress, Address } from './state_classes/address.js';
+import {
+  restoreProtoTypeCustomer,
+  Customer,
+} from './state_classes/customer.js';
 import { restoreProtoTypeRoute } from './state_classes/userRoute.js';
 
-import { API_WAIT } from './config.js';
-import { API_KEY } from './config.js';
-import { API_URL } from './config.js';
-import { getJSON } from './helper.js';
-import { wait } from './helper.js';
-
-import { Customer } from './state_classes/customer.js';
-import { Address } from './state_classes/address.js';
+import { API_WAIT, API_KEY, API_URL } from './config.js';
+import { getJSON, wait } from './helper.js';
 
 let Place;
 
@@ -163,10 +159,7 @@ export async function tryFetchAddress(addresses) {
       const data = await getJSON(url); // get API response using getJSON helper function
       await wait(API_WAIT); // delay to avoid overloading API server
 
-      if (data.status !== 'OK') {
-        console.log(data);
-        throw new Error(`No results found!`);
-      }
+      if (data.status !== 'OK') throw new Error(`No results found!`);
 
       const { results } = data;
 
@@ -216,9 +209,11 @@ export function updateLocalStorage() {
   );
 
   // removing html tables
-  tempState.userRoutes = tempState.userRoutes.map(({ table, ...rest }) => ({
-    ...rest,
-  }));
+  tempState.userRoutes = tempState.userRoutes.map(
+    ({ table, rowContainer, ...rest }) => ({
+      ...rest,
+    })
+  );
 
   localStorage.setItem('storedState', JSON.stringify(tempState));
 }

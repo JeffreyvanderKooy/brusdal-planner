@@ -61,3 +61,8 @@ tr:hover .row-delete {
 .w-40 {
   width: 38% !important;
 }
+
+.error-modal {
+  max-height: 40vh;
+  overflow: auto;
+}

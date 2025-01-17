@@ -9,9 +9,7 @@ import { DELAY_SEARCH_FILTER } from '../config.js';
 
 import mapView from './mapView.js';
 import { state } from '../model.js';
-import { filterByMonth } from '../helper.js';
-import { addressesInPlannedRoutes } from '../helper.js';
-import { search } from '../helper.js';
+import { filterByMonth, addressesInPlannedRoutes, search } from '../helper.js';
 
 class OrdersContainer {
   // used to store all addresses that are currently not in a userRoute and also have ordered in the given amount of "months"
@@ -45,7 +43,7 @@ class OrdersContainer {
       if (this.#isSearching) clearTimeout(this.#isSearching);
 
       this.#isSearching = setTimeout(
-        this.#searchCustomers.bind(this),
+        this.searchCustomers.bind(this),
         DELAY_SEARCH_FILTER
       );
     });
@@ -55,8 +53,8 @@ class OrdersContainer {
       if (this.#isFiltering) clearTimeout(this.#isFiltering);
 
       this.#isFiltering = setTimeout(() => {
-        this.#filterAddresses() // Refilter addresses
-          .#searchCustomers(); // hide/show HTML cards)}
+        this.filterAddresses() // Refilter addresses
+          .searchCustomers(); // hide/show HTML cards)}
         mapView.showMarkers(this.#filteredAddresses); // hides all current markers and shows the ones in this.#filtered
       }, DELAY_SEARCH_FILTER);
     });
@@ -66,7 +64,7 @@ class OrdersContainer {
    * searches the currently filtered customers for the customers of wich the properties include what the user typed for in the searchbar
    * @returns ordersContainerView
    */
-  #searchCustomers() {
+  searchCustomers() {
     // get current search input
     const query = $(this.#searchInput).val().toLowerCase();
 
@@ -99,7 +97,7 @@ class OrdersContainer {
    * filters the addresses based on number of months input, also called when months input is called to rerender markers on map and HTML cards
    * @returns ordersContainerView
    */
-  #filterAddresses() {
+  filterAddresses() {
     const addressesInRoutes = addressesInPlannedRoutes().map(
       address => address.id
     );
@@ -223,13 +221,13 @@ class OrdersContainer {
   }
 
   // # RETURNS THIS.FILTEREDADDRESSES # //
-  getFilteredAddresses() {
+  get filteredAddresses() {
     return this.#filteredAddresses;
   }
 
   // # REFILTERS ADDRESS, RENDERS A MAPHEADER BUTTON FOR EACH ROUTE, CREATES A MARKER FOR EACH FILTERED ADDRESS AND CREATES HTML CARDS FOR THESE # //
   update(input) {
-    this.render(input).#filterAddresses().#searchCustomers();
+    this.render(input).filterAddresses().searchCustomers();
     mapView.renderHighlightRouteBtn().showMarkers(this.#filteredAddresses);
 
     return this;

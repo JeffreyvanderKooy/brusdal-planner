@@ -1,6 +1,9 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const API_URL = 'https://maps.googleapis.com/maps/api/geocode';
 
-export const API_KEY = 'AIzaSyA0jg_ZbQwx2J2jNcvF_fTWL3xZE8HvsMQ';
+export const API_KEY = process.env.API_KEY;
 
 export const API_WAIT = 0.15;
 
