@@ -2,9 +2,10 @@
   "name": "norengros-project",
   "version": "1.0.0",
   "description": "NorEngros Project",
+  "default": "index.html",
   "scripts": {
-    "start": "parcel bootstrap.html",
-    "build": "parcel build bootstrap.html"
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
   },
   "author": "Jeffrey van der Kooy",
   "license": "ISC",

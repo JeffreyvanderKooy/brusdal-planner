@@ -30,7 +30,7 @@ function controlNewRoute(e) {
   const newRoute = routesContainerView.createNewRoute(e);
 
   // if no new route obj return
-  if (!newRoute) return modalView.error();
+  if (!newRoute) return;
 
   // add this new route obj to state const
   model.pushRoute(newRoute);
