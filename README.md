@@ -1,4 +1,3 @@
-
 # Brusdal Planner
 
 Brusdal Planner is a web-based application that helps you visualize customers and deliveries on a map, turning raw data into structured JSON data. It leverages the Google Maps API for mapping, geocoding, and geoparsing to enhance user experience. The app also uses a local host for storage and a variety of libraries for front-end interactivity and smooth user interactions.
@@ -33,19 +32,22 @@ Before running the application, ensure that you have the following installed:
 ### Steps
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-username/brusdal-planner.git
    ```
 
 2. Install dependencies:
+
    ```bash
    cd brusdal-planner
    npm install
    ```
 
-3. Add your **Google Maps API key** in the appropriate file (e.g., `config.js` or environment variable).
+3. Add your **Google Maps API key** in the appropriate file the config.js file
 
 4. Run the app locally:
+
    ```bash
    npm run start
    ```
