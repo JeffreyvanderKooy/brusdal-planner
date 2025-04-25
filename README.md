@@ -2,6 +2,7 @@
 
 Brusdal Planner is a web-based application that helps you visualize customers and deliveries on a map, turning raw data into structured JSON data. It leverages the Google Maps API for mapping, geocoding, and geoparsing to enhance user experience. The app also uses a local host for storage and a variety of libraries for front-end interactivity and smooth user interactions.
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/2591b742-a2ab-445e-b17e-da6d528cf339/deploy-status)](https://app.netlify.com/sites/brusdalplanner/deploys)
 **Demo:** [Brusdal Planner Demo](https://brusdalplanner.netlify.app/)
 
 ## Key Features
@@ -19,8 +20,6 @@ Brusdal Planner is a web-based application that helps you visualize customers an
 - **JQuery**: To simplify DOM manipulation and event handling.
 - **Parcel**: Bundler used for module bundling and asset management.
 - **SweetAlert**: For stylish and customizable alerts.
-
-## Installation
 
 ### Prerequisites
 
@@ -56,7 +55,7 @@ Before running the application, ensure that you have the following installed:
 
 ## Contributing
 
-We welcome contributions! If you'd like to help improve Brusdal Planner, please follow these steps:
+I welcome contributions! If you'd like to help improve Brusdal Planner, please follow these steps:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature-branch`).
